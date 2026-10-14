@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sonuçlar</title>
+<style>body{font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;padding:16px;background:#eef2ff;color:#1e1b4b}
+.b{background:#fff;border-radius:12px;padding:12px;margin:10px 0}.bar{height:16px;background:#e0e7ff;border-radius:8px;overflow:hidden}
+.bar i{display:block;height:100%;background:#6366f1}.r{display:grid;grid-template-columns:90px 1fr 50px;gap:8px;align-items:center;margin:6px 0}</style></head>
+<body><h1>📊 Sonuçlar</h1><div id="o">Yükleniyor...</div>
+<script>
+const NS="aekatipoglu-phishingquiz",API="https://abacus.jasoncameron.dev";
+const get=k=>fetch(`${API}/get/${NS}/${k}`).then(r=>r.ok?r.json():{value:0}).then(j=>j.value||0).catch(()=>0);
+const row=(l,v,max,suf)=>`<div class="r"><span>${l}</span><div class="bar"><i style="width:${max?v/max*100:0}%"></i></div><b>${suf?v+suf:v}</b></div>`;
+(async()=>{
+ const sk=await Promise.all(Array.from({length:11},(_,k)=>get("skor"+k)));
+ const qs=await Promise.all(Array.from({length:10},(_,k)=>get("soru"+k+"dogru")));
+ const n=await get("total");
+ document.getElementById("o").innerHTML=`<div class="b"><h2>Toplam oyuncu: ${n}</h2>Ortalama puan: ${n?(sk.reduce((a,v,k)=>a+v*k,0)/n).toFixed(1):0}/10</div>
+ <div class="b"><h3>Soru bazlı doğru oranı</h3>${qs.map((v,k)=>row("Soru "+(k+1),n?Math.round(v/n*100):0,100,"%")).join("")}</div>
+ <div class="b"><h3>Puan dağılımı (kişi sayısı)</h3>${sk.map((v,k)=>row(k+" doğru",v,Math.max(...sk),"")).join("")}</div>`;
+})();
+</script></body></html>
